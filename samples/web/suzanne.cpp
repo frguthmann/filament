@@ -77,6 +77,25 @@ static Texture* setTextureParameter(Engine& engine, filaweb::Asset& asset, strin
     uint8_t* data;
     uint32_t nbytes;
     asset.texture->getBlob({}, &data, &nbytes);
+
+    if (info.glFormat == 0) {
+        assert(info.pixelWidth == info.pixelHeight);
+        auto format = (driver::CompressedPixelDataType) info.glInternalFormat;
+        Texture::PixelBufferDescriptor pb(data, nbytes, format, info.pixelWidth, destructor,
+                &asset);
+
+        auto texture = Texture::Builder()
+                .width(info.pixelWidth)
+                .height(info.pixelHeight)
+                .sampler(Texture::Sampler::SAMPLER_2D)
+                .format((driver::TextureFormat) info.glInternalFormat)
+                .build(engine);
+
+        texture->setImage(engine, 0, std::move(pb));
+        app.mi->setParameter(name.c_str(), texture, sampler);
+        return texture;
+    }
+
     Texture::PixelBufferDescriptor pb(data, nbytes, format, Texture::Type::UBYTE, destructor,
             &asset);
 

@@ -82,6 +82,7 @@ public class Texture {
         ETC2_RGB8, ETC2_SRGB8,
         ETC2_RGB8_A1, ETC2_SRGB8_A1,
         ETC2_EAC_RGBA8, ETC2_EAC_SRGBA8,
+        // TODO
 
         // Available everywhere except Android/iOS
         DXT1_RGB, DXT1_RGBA, DXT3_RGBA, DXT5_RGBA
@@ -96,6 +97,7 @@ public class Texture {
 
         // Available everywhere except Android/iOS
         DXT1_RGB, DXT1_RGBA, DXT3_RGBA, DXT5_RGBA
+        // TODO
     }
 
     public enum CubemapFace {

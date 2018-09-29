@@ -360,6 +360,9 @@ constexpr /* inline */ GLenum getInternalFormat(filament::driver::TextureFormat 
             // this should not happen
             return 0;
 #endif
+        // ASTC formats fall through to here.
+        default:
+            return (GLenum) format;
     }
 };
 

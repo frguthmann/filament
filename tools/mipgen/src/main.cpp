@@ -256,7 +256,8 @@ int main(int argc, char* argv[]) {
         // which might make sense when generating individual files, but for a KTX
         // bundle, we want to include level 0, so add 1 to the KTX level count.
         KtxBundle container(1 + miplevels.size(), 1, false);
-        container.info() = {
+        auto& info = container.info();
+        info = {
             .endianness = KtxBundle::ENDIAN_DEFAULT,
             .glType = KtxBundle::UNSIGNED_BYTE,
             .glTypeSize = 3,
@@ -268,7 +269,6 @@ int main(int argc, char* argv[]) {
             .pixelDepth = 0,
         };
         if (g_grayscale) {
-            auto& info = container.info();
             info.glTypeSize = 1;
             info.glFormat =
             info.glInternalFormat =
@@ -286,9 +286,15 @@ int main(int argc, char* argv[]) {
                 cerr << "Unrecognized compression: " << g_compression << endl;
                 return 1;
             }
+            // The KTX spec says the following for compressed textures: glTypeSize should 1,
+            // glFormat should be 0, and glBaseInternalFormat should be RED, RG, RGB, or RGBA.
+            // The glInternalFormat field is the only field that specifies the actual format.
+            info.glTypeSize = 1;
+            info.glFormat = 0;
+            info.glBaseInternalFormat = KtxBundle::RGBA;
         }
         uint32_t mip = 0;
-        auto addLevel = [&container, &mip, astcConfig, inputPath](const LinearImage& image) {
+        auto addLevel = [&container, &mip, &info, astcConfig, inputPath](const LinearImage& image) {
             std::unique_ptr<uint8_t[]> data;
             if (astcConfig.blocksize[0] > 0) {
                 // The ASTC encoder calls exit(1) if it fails, so it's very useful to print some
@@ -301,6 +307,7 @@ int main(int argc, char* argv[]) {
                 // carriage return without a line feed.
                 putc('\n', stdout);
                 container.setBlob({mip++}, tex.data.get(), tex.size);
+                info.glInternalFormat = (uint32_t) tex.format;
                 return;
             }
             if (g_grayscale && g_linearized) {

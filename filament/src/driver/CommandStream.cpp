@@ -364,6 +364,7 @@ io::ostream& operator<<(io::ostream& out, TextureFormat format) {
         CASE(TextureFormat, DXT1_RGBA)
         CASE(TextureFormat, DXT3_RGBA)
         CASE(TextureFormat, DXT5_RGBA)
+        // TODO
     }
     return out;
 }
